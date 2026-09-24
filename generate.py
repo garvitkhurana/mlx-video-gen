@@ -5,13 +5,15 @@ import gc
 import random
 from pathlib import Path
 
-from clips import OUTPUTS, ROOT, clip_record, load_json, new_id, read_prompts, rebuild_manifest, write_json
+from clips import OUTPUTS, ROOT, clip_record, load_json, new_id, read_prompts, rebuild_manifest, split_prompt, write_json
 
 DEFAULT_MODEL = ROOT / "models" / "Wan2.2-TI2V-5B-MLX"
 DEFAULT_WIDTH = 704
 DEFAULT_HEIGHT = 1280
 DEFAULT_FRAMES = 41
 DEFAULT_STEPS = 20
+TURBO_LORA = ROOT / "models" / "loras" / "LoRAs" / "Wan22-Turbo" / "Wan22_TI2V_5B_Turbo_lora_rank_64_fp16.safetensors"
+TURBO_PRESET = {"steps": 4, "guide_scale": 1.0, "scheduler": "euler", "shift": 5.0}
 
 
 def release_memory() -> None:
@@ -25,7 +27,11 @@ def release_memory() -> None:
 
 
 def image_ref(image: Path) -> str:
-    resolved = image.resolve()
+    return path_ref(image)
+
+
+def path_ref(path: Path) -> str:
+    resolved = Path(path).resolve()
     try:
         return resolved.relative_to(ROOT).as_posix()
     except ValueError:
@@ -54,6 +60,12 @@ def generate_one(
     guide_scale: float | None,
     output: Path | None,
     image: Path | None = None,
+    motion_prompt: str | None = None,
+    loras: list | None = None,
+    scheduler: str | None = None,
+    shift: float | None = None,
+    tiling: str | None = None,
+    trim_first_frames: int | None = None,
 ) -> Path:
     check_frames(num_frames)
     if not model_dir.is_dir():
@@ -62,6 +74,10 @@ def generate_one(
         )
     if image is not None and not image.is_file():
         raise SystemExit(f"start image not found: {image}")
+    loras = [(Path(path) if Path(path).is_absolute() else ROOT / path, strength) for path, strength in loras or []]
+    for lora_path, _ in loras:
+        if not Path(lora_path).is_file():
+            raise SystemExit(f"LoRA not found: {lora_path}. Download it first (see README).")
     chosen = choose_seed(seed)
     OUTPUTS.mkdir(parents=True, exist_ok=True)
     clip_id = output.stem if output else new_id(OUTPUTS)
@@ -73,9 +89,16 @@ def generate_one(
     except ImportError as exc:
         raise SystemExit("mlx-video is not installed. From the repo root: uv sync") from exc
 
+    extra = {
+        "loras": [(str(path), float(strength)) for path, strength in loras] if loras else None,
+        "scheduler": scheduler,
+        "shift": shift,
+        "tiling": tiling,
+        "trim_first_frames": trim_first_frames,
+    }
     generate_video(
         model_dir=str(model_dir),
-        prompt=prompt,
+        prompt=motion_prompt or prompt,
         width=width,
         height=height,
         num_frames=num_frames,
@@ -84,6 +107,7 @@ def generate_one(
         guide_scale=guide_scale,
         image=str(image) if image else None,
         output_path=str(video),
+        **{key: value for key, value in extra.items() if value is not None},
     )
     record = clip_record(
         clip_id=clip_id,
@@ -96,6 +120,12 @@ def generate_one(
         guide_scale=guide_scale,
         model=model_dir.name.removesuffix("-MLX"),
         image=image_ref(image) if image else None,
+        motion_prompt=motion_prompt,
+        loras=[[path_ref(path), float(strength)] for path, strength in loras] if loras else None,
+        scheduler=scheduler,
+        shift=shift,
+        tiling=tiling,
+        trim_first_frames=trim_first_frames,
     )
     write_json(video.with_suffix(".json"), record)
     if video.parent.resolve() == OUTPUTS.resolve():
@@ -118,6 +148,14 @@ def settings_from_args(args: argparse.Namespace, base: dict | None = None) -> di
         "seed": args.seed if args.seed is not None else base.get("seed"),
         "guide_scale": args.guide_scale if args.guide_scale is not None else base.get("guide_scale"),
         "image": args.image if args.image is not None else (Path(base["image"]) if base.get("image") else None),
+        "motion_prompt": args.motion if args.motion is not None else base.get("motion_prompt"),
+        "loras": args.lora if args.lora is not None else base.get("loras"),
+        "scheduler": args.scheduler if args.scheduler is not None else base.get("scheduler"),
+        "shift": args.shift if args.shift is not None else base.get("shift"),
+        "tiling": args.tiling if args.tiling is not None else base.get("tiling"),
+        "trim_first_frames": (
+            args.trim_first_frames if args.trim_first_frames is not None else base.get("trim_first_frames")
+        ),
     }
 
 
@@ -136,7 +174,21 @@ def main() -> None:
     parser.add_argument("--guide-scale", type=float, default=None, help="How tightly to follow the prompt. Higher sticks closer.")
     parser.add_argument("--image", type=Path, default=None, help="Start frame. Skips making a still.")
     parser.add_argument("--still", action="store_true", help="Make a Z-Image Turbo still, then animate it")
+    parser.add_argument("--motion", default=None, help="Video-stage prompt: only what moves. The still uses the main prompt.")
+    parser.add_argument("--turbo", action="store_true", help="Turbo LoRA preset: 4 steps, CFG off. Explicit flags override.")
+    parser.add_argument("--lora", nargs=2, action="append", metavar=("PATH", "STRENGTH"), default=None)
+    parser.add_argument("--scheduler", choices=["euler", "dpm++", "unipc"], default=None)
+    parser.add_argument("--shift", type=float, default=None, help="Noise schedule shift")
+    parser.add_argument("--tiling", default=None, help="VAE decode tiling: auto, none, default, aggressive, conservative, spatial, temporal")
+    parser.add_argument("--trim-first-frames", type=int, default=None, help="Extra latent frames to generate and drop at the start (x4 frames)")
     args = parser.parse_args()
+
+    if args.turbo:
+        for key, value in TURBO_PRESET.items():
+            if getattr(args, key) is None:
+                setattr(args, key, value)
+        if args.lora is None:
+            args.lora = [[str(TURBO_LORA), "1.0"]]
 
     if args.prompts and (args.prompt or args.from_json):
         parser.error("use either a prompt, --from, or --prompts")
@@ -152,10 +204,11 @@ def main() -> None:
             parser.error("--from expects a clip sidecar, not a branded file")
 
     if args.prompts:
-        jobs = [
-            settings_from_args(argparse.Namespace(**{**vars(args), "prompt": line}), base)
-            for line in read_prompts(args.prompts)
-        ]
+        jobs = []
+        for line in read_prompts(args.prompts):
+            still_prompt, motion = split_prompt(line)
+            overrides = {"prompt": still_prompt, "motion": motion or args.motion}
+            jobs.append(settings_from_args(argparse.Namespace(**{**vars(args), **overrides}), base))
     else:
         job = settings_from_args(args, base)
         if not job["prompt"]:
@@ -183,6 +236,12 @@ def main() -> None:
             guide_scale=job["guide_scale"],
             output=args.output,
             image=image,
+            motion_prompt=job["motion_prompt"],
+            loras=job["loras"],
+            scheduler=job["scheduler"],
+            shift=job["shift"],
+            tiling=job["tiling"],
+            trim_first_frames=job["trim_first_frames"],
         )
 
 

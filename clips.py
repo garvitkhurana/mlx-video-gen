@@ -36,6 +36,12 @@ def clip_record(
     model: str | None = None,
     created_at: str | None = None,
     image: str | None = None,
+    motion_prompt: str | None = None,
+    loras: list | None = None,
+    scheduler: str | None = None,
+    shift: float | None = None,
+    tiling: str | None = None,
+    trim_first_frames: int | None = None,
 ) -> dict:
     record = {
         "id": clip_id,
@@ -52,9 +58,23 @@ def clip_record(
     }
     if guide_scale is not None:
         record["guide_scale"] = guide_scale
-    if image is not None:
-        record["image"] = image
+    optional = {
+        "image": image,
+        "motion_prompt": motion_prompt,
+        "loras": loras,
+        "scheduler": scheduler,
+        "shift": shift,
+        "tiling": tiling,
+        "trim_first_frames": trim_first_frames,
+    }
+    record.update({key: value for key, value in optional.items() if value})
     return record
+
+
+def split_prompt(line: str) -> tuple[str, str | None]:
+    """`still prompt || motion prompt` -> (still, motion). Motion is None without `||`."""
+    still, sep, motion = line.partition("||")
+    return still.strip(), (motion.strip() or None) if sep else None
 
 
 def branded_record(source_id: str, template_name: str, created_at: str | None = None) -> dict:

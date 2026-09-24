@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 from pathlib import Path
 
-from clips import OUTPUTS, ROOT, load_json, new_id, read_prompts, write_json
+from clips import OUTPUTS, ROOT, load_json, new_id, read_prompts, split_prompt, write_json
 
 DEFAULT_MODEL = ROOT / "models" / "Z-Image-Turbo-mflux-4bit"
 HF_MODEL = "filipstrand/Z-Image-Turbo-mflux-4bit"
@@ -130,7 +130,7 @@ def main() -> None:
             parser.error("--from expects a still sidecar")
 
     if args.prompts:
-        prompts = read_prompts(args.prompts)
+        prompts = [split_prompt(line)[0] for line in read_prompts(args.prompts)]
     else:
         prompt = args.prompt if args.prompt is not None else base.get("prompt")
         if not prompt:
