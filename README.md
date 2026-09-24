@@ -41,7 +41,16 @@ uv run python generate.py --from outputs/<id>.json
 
 `--num-frames` must be 4n+1 (17, 41, 81). A bare `generate.py` call uses Wan 2.2 5B and asks for `--still` or `--image`.
 
-`prompts.txt` is one prompt per line. `#` starts a comment.
+`--turbo` adds the Wan 2.2 5B Turbo LoRA: 4 steps, CFG off, about 4 min for 41 frames instead of 20. It needs the LoRA in `models/loras`:
+
+```bash
+uv run hf download Kijai/WanVideo_comfy LoRAs/Wan22-Turbo/Wan22_TI2V_5B_Turbo_lora_rank_64_fp16.safetensors --local-dir models/loras
+uv run python generate.py "<still prompt>" --still --turbo --motion "<what moves>"
+```
+
+`--motion` is the video prompt. Describe only what moves (hair, waves, camera). Do not restate the scene or an expression the still already has, or the model redraws and exaggerates it. For people, frame the still at a medium shot or closer: faces in full-body shots are too small to hold steady.
+
+`prompts.txt` is one prompt per line. `#` starts a comment. `still prompt || motion prompt` gives the clip its own motion prompt.
 
 A still writes `outputs/<id>.png` and `outputs/<id>.json`. A clip writes `outputs/<id>.mp4` and `outputs/<id>.json`, then refreshes `outputs/manifest.json`.
 
