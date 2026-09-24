@@ -32,6 +32,7 @@ def generate_one(
     num_frames: int,
     steps: int,
     seed: int | None,
+    guide_scale: float | None,
     output: Path | None,
 ) -> Path:
     check_frames(num_frames)
@@ -58,6 +59,7 @@ def generate_one(
         num_frames=num_frames,
         steps=steps,
         seed=chosen,
+        guide_scale=guide_scale,
         output_path=str(video),
     )
     record = clip_record(
@@ -68,6 +70,8 @@ def generate_one(
         height=height,
         num_frames=num_frames,
         steps=steps,
+        guide_scale=guide_scale,
+        model=model_dir.name.removesuffix("-MLX"),
     )
     write_json(video.with_suffix(".json"), record)
     if video.parent.resolve() == OUTPUTS.resolve():
@@ -88,6 +92,7 @@ def settings_from_args(args: argparse.Namespace, base: dict | None = None) -> di
         ),
         "steps": args.steps if args.steps is not None else base.get("steps", DEFAULT_STEPS),
         "seed": args.seed if args.seed is not None else base.get("seed"),
+        "guide_scale": args.guide_scale if args.guide_scale is not None else base.get("guide_scale"),
     }
 
 
@@ -103,6 +108,7 @@ def main() -> None:
     parser.add_argument("--num-frames", type=int, default=None)
     parser.add_argument("--steps", type=int, default=None)
     parser.add_argument("--seed", type=int, default=None, help="Omit for a new random seed, saved in the JSON")
+    parser.add_argument("--guide-scale", type=float, default=None, help="How tightly to follow the prompt. Higher sticks closer.")
     args = parser.parse_args()
 
     if args.prompts and (args.prompt or args.from_json):
@@ -136,6 +142,7 @@ def main() -> None:
             num_frames=job["num_frames"],
             steps=job["steps"],
             seed=job["seed"],
+            guide_scale=job["guide_scale"],
             output=args.output,
         )
 

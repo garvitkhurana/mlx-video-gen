@@ -14,6 +14,18 @@ This machine is a MacBook Pro (M5, 10-core GPU, 32 GB). The goal is to iterate o
 
 **Quality:** 1.3B at 480p is for testing prompts. It will not look like a top-tier model. Finals can later try Wan 2.2 5B on this Mac, or 14B on a rented GPU. Neither starts until this loop works.
 
+## 2026-09-24 — Wan 2.2 5B, short clips
+
+The loop works, so 5B was tried. 4-bit `Wan2.2-TI2V-5B` rendered 704×1280, 17 frames, 10 steps in about 3.5 minutes on this 32 GB Mac. Text-only, no start image.
+
+1.3B stays the fast prompt test. 5B is the better local model for a short clip. 14B still does not fit this machine.
+
+## Prompt following
+
+Wan 2.2 5B with no start image follows the setting and drops an unusual subject. The paper-boat prompt became an empty wet street for the whole clip.
+
+Wan 2.1 1.3B is the text-to-video model. Name the subject and its size first, then the setting. `--guide-scale 7` holds that subject. A rewritten prompt produced a small white paper boat on wet pavement (`outputs/20260924-091507.mp4`).
+
 ## Rejected — SVD (first draft)
 
 **Video Generation Model:** Stable Video Diffusion (SVD) via Hugging Face `diffusers` library

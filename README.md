@@ -29,7 +29,17 @@ uv run python generate.py --from outputs/20260924-012200.json
 uv run python generate.py "..." --width 832 --height 480 --num-frames 81 --steps 50
 ```
 
+Wan 2.2 5B is the sharper local model. It wants more steps than 1.3B. 704×1280 is its portrait 720p.
+
+```bash
+uv run python generate.py "A paper boat crosses a rain-lit street at night, camera low, no text" \
+  --model-dir models/Wan2.2-TI2V-5B-MLX \
+  --width 704 --height 1280 --num-frames 17 --steps 40
+```
+
 `--num-frames` must be 4n+1 (17, 41, 81). 480×832 and 832×480 are this model's native 480p.
+
+Name the subject and its size before the setting. `--guide-scale 7` holds an unusual object more tightly than the default. Wan 2.2 5B, with no start image, tends to paint the place and drop that object.
 
 `prompts.txt` is one prompt per line. `#` starts a comment.
 

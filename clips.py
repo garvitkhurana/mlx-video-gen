@@ -32,9 +32,11 @@ def clip_record(
     height: int,
     num_frames: int,
     steps: int,
+    guide_scale: float | None = None,
+    model: str | None = None,
     created_at: str | None = None,
 ) -> dict:
-    return {
+    record = {
         "id": clip_id,
         "kind": "clip",
         "prompt": prompt,
@@ -43,10 +45,13 @@ def clip_record(
         "height": height,
         "num_frames": num_frames,
         "steps": steps,
-        "model": MODEL_NAME,
+        "model": model or MODEL_NAME,
         "created_at": created_at or datetime.now().astimezone().isoformat(timespec="seconds"),
         "video": f"{clip_id}.mp4",
     }
+    if guide_scale is not None:
+        record["guide_scale"] = guide_scale
+    return record
 
 
 def branded_record(source_id: str, template_name: str, created_at: str | None = None) -> dict:
