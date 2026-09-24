@@ -1,6 +1,6 @@
 # DECISIONS.md
 
-## Current — Wan 2.1 1.3B (2026-09-24)
+## 2026-09-24 — Rejected — Wan 2.1 1.3B
 
 This machine is a MacBook Pro (M5, 10-core GPU, 32 GB). The goal is to iterate on text prompts for short ads.
 
@@ -40,3 +40,7 @@ Wan 2.1 1.3B is the text-to-video model. Name the subject and its size first, th
 **Infrastructure:** Local/cloud GPU (start local for MVP, scale as needed)
 
 **Why it was picked, then dropped:** SVD was chosen over AnimateDiff for a simpler first run. It does not take a text prompt, and this Mac is not an NVIDIA GPU. A generation API was dropped with it: a clip takes minutes, so the first loop is a prompts file and a static feed.
+
+## 2026-09-24 — Z-Image Turbo still, then Wan 2.2 5B
+
+The local clip is a Z-Image Turbo still, then Wan 2.2 5B from that frame (704×1280, 41 frames, 20 steps). The still is the prompt test. 1.3B is no longer the draft. Its weights stay until a still-then-5B paper-boat clip looks right. 14B stays off this machine.

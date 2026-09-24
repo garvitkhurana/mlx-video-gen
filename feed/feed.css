@@ -49,12 +49,21 @@ article {
   overflow: hidden;
 }
 
-video {
+video, .start {
   display: block;
   width: 100%;
   background: #000;
-  aspect-ratio: 9 / 16;
   object-fit: contain;
+}
+
+video {
+  aspect-ratio: 9 / 16;
+}
+
+.start {
+  max-height: 9rem;
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
 }
 
 .meta {

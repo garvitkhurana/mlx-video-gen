@@ -13,7 +13,7 @@ def new_id(directory: Path) -> str:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     candidate = stamp
     n = 2
-    while (directory / f"{candidate}.mp4").exists() or (directory / f"{candidate}.json").exists():
+    while any((directory / f"{candidate}{suffix}").exists() for suffix in (".mp4", ".png", ".json")):
         candidate = f"{stamp}-{n}"
         n += 1
     return candidate
@@ -35,6 +35,7 @@ def clip_record(
     guide_scale: float | None = None,
     model: str | None = None,
     created_at: str | None = None,
+    image: str | None = None,
 ) -> dict:
     record = {
         "id": clip_id,
@@ -51,6 +52,8 @@ def clip_record(
     }
     if guide_scale is not None:
         record["guide_scale"] = guide_scale
+    if image is not None:
+        record["image"] = image
     return record
 
 

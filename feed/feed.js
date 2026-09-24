@@ -10,6 +10,13 @@ function card(clip) {
   if (clip.width && clip.height) {
     video.style.aspectRatio = `${clip.width} / ${clip.height}`;
   }
+  if (clip.image) {
+    const still = document.createElement("img");
+    still.className = "start";
+    still.alt = "Start frame";
+    still.src = clip.image.startsWith("/") ? clip.image : `../${clip.image}`;
+    article.append(still);
+  }
   const meta = document.createElement("p");
   meta.className = "meta";
   const prompt = document.createElement("strong");
