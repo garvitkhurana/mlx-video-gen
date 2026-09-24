@@ -1,0 +1,9 @@
+[project]
+name = "video-gen"
+version = "0.0.1"
+description = "Local Wan 2.1 text-to-video clips"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "mlx-video @ git+https://github.com/Blaizzy/mlx-video.git",
+]

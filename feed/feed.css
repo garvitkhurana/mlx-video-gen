@@ -1,0 +1,70 @@
+:root {
+  color-scheme: dark;
+  --bg: #12110e;
+  --card: #1c1a16;
+  --ink: #f3efe6;
+  --muted: #9a9286;
+  --line: #2e2a24;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.45 "Avenir Next", "Segoe UI", sans-serif;
+}
+
+header {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 0.5rem;
+}
+
+.mark {
+  margin: 0;
+  font-family: Palatino, Georgia, serif;
+  font-size: 1.75rem;
+}
+
+.note, .meta, .empty {
+  color: var(--muted);
+}
+
+.note { margin: 0.25rem 0 0; }
+
+main {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+article {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+video {
+  display: block;
+  width: 100%;
+  background: #000;
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+}
+
+.meta {
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.meta strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}

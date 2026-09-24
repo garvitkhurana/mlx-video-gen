@@ -1,0 +1,4 @@
+# One prompt per line. Lines starting with # are skipped.
+# Footage only. Add words, logos, and prices later with brand.py.
+
+A paper boat crosses a rain-lit street at night, camera low, no text

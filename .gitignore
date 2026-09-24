@@ -1,1 +1,5 @@
 STATUS.md
+.venv/
+__pycache__/
+outputs/
+models/
