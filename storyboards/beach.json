@@ -1,0 +1,27 @@
+{
+  "title": "Golden hour swim",
+  "target_s": 6,
+  "voice": null,
+  "captions": true,
+  "shots": [
+    {
+      "type": "ai",
+      "still": "Close-up of an adult woman's face and bare shoulders on a tropical beach at golden hour, long brown hair, soft closed-mouth smile, warm backlight, ocean softly blurred behind her, swimwear commercial, cinematic, no text.",
+      "motion": "Her hair blows in the wind and she turns her head slightly toward the camera. Her face stays calm with the same soft smile.",
+      "dur": 2.5,
+      "caption": "Golden hour."
+    },
+    {
+      "type": "ai",
+      "continue": true,
+      "motion": "She slowly turns her face toward the camera and holds its gaze, her hair blowing in the wind. Her face stays calm with the same soft closed-mouth smile. The camera drifts slowly to the side.",
+      "dur": 3.5,
+      "caption": "Made for the shoreline."
+    }
+  ],
+  "end_card": {
+    "caption": "Shop the drop",
+    "cta": "Link in bio",
+    "dur": 1.0
+  }
+}

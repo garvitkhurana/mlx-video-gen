@@ -7,4 +7,5 @@ requires-python = ">=3.11"
 dependencies = [
   "mlx-video @ git+https://github.com/Blaizzy/mlx-video.git",
   "mflux",
+  "tiktoken>=0.14.0",
 ]

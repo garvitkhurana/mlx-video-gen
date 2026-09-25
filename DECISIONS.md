@@ -56,3 +56,23 @@ Clips are a Z-Image still, then Wan 2.2 5B with the Turbo LoRA (`Wan22_TI2V_5B_T
 **License:** neither the LoRA nor the quanhaol model card states a license. Clear this before a clip is used in a paid ad.
 
 **Known limit:** faces in full-body shots are small for the VAE and drift. Decode is now most of a 5 s clip's time (851 of 1087 s).
+
+## 2026-09-24 — Voiceover from ~/Projects/voice-clone (Qwen3-TTS clone, lite)
+
+Narration uses the user's voice-clone project (Qwen3-TTS 0.6B 8-bit on mlx-audio), called as a subprocess with `uv run --project ~/Projects/voice-clone`. Reference: `securities_clip.m4a` (the user's own voice) plus `documents/ref_voice_transcript.txt`. One wav per shot, cached by text, voice, and speed.
+
+**Why:** already built and tuned (chunking, ref cache, speed). A consistent brand voice. Same MLX stack, separate environment.
+
+**Not chosen:** Kokoro (stock voice, extra download). Building new TTS here.
+
+## 2026-09-24 — Storyboards with typed shots: AI footage vs code-drawn graphics
+
+A video is `storyboards/<name>.json`. `make.py` renders each shot by type and assembles them with ffmpeg:
+- `ai`: Z-Image still, then Wan 2.2 5B `--turbo`.
+- `notes`, `card`, `chart`: drawn with PIL and matplotlib.
+
+Shots are cached by hash. Voiceover length sets shot length. AI shots stay 2–3 s.
+
+**Why:** the video models cannot draw readable text, charts, or accurate facts. Code-drawn graphics are exact and instant. Caching means editing a caption or a line never re-renders footage.
+
+**Not chosen:** one AI clip per video (no text or data). Text-rendering image models for diagrams (text errors, facts not checkable).

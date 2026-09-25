@@ -49,6 +49,15 @@ def check_frames(num_frames: int) -> None:
         raise SystemExit("num-frames must be 4n+1, for example 17, 41, or 81")
 
 
+def as_promo(text: str) -> tuple[str, str]:
+    thing, motion = split_prompt(text)
+    still = (
+        f"{thing}. Large in the frame, commercial product shot, "
+        "clean background, no text, no logo, no price."
+    )
+    return still, motion or "The camera slowly pushes in."
+
+
 def generate_one(
     prompt: str,
     model_dir: Path,
@@ -161,7 +170,8 @@ def settings_from_args(args: argparse.Namespace, base: dict | None = None) -> di
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a short Wan 2.2 clip from a still")
-    parser.add_argument("prompt", nargs="?", help="Text prompt")
+    parser.add_argument("prompt", nargs="?", help="Text prompt, or with --promote the thing being advertised")
+    parser.add_argument("--promote", action="store_true", help="Advertise this. Builds the still and a slow push-in, then renders.")
     parser.add_argument("--prompts", type=Path, help="Text file with one prompt per line")
     parser.add_argument("--from", dest="from_json", type=Path, help="Rerun a saved clip JSON")
     parser.add_argument("--model-dir", type=Path, default=DEFAULT_MODEL)
@@ -182,6 +192,15 @@ def main() -> None:
     parser.add_argument("--tiling", default=None, help="VAE decode tiling: auto, none, default, aggressive, conservative, spatial, temporal")
     parser.add_argument("--trim-first-frames", type=int, default=None, help="Extra latent frames to generate and drop at the start (x4 frames)")
     args = parser.parse_args()
+
+    if args.promote:
+        if args.image or args.from_json:
+            parser.error("--promote makes a new still and clip")
+        if not args.prompt and not args.prompts:
+            parser.error("pass what you are promoting")
+        args.still = True
+        if args.steps is None:
+            args.turbo = True
 
     if args.turbo:
         for key, value in TURBO_PRESET.items():
@@ -206,13 +225,21 @@ def main() -> None:
     if args.prompts:
         jobs = []
         for line in read_prompts(args.prompts):
-            still_prompt, motion = split_prompt(line)
+            if args.promote:
+                still_prompt, motion = as_promo(line)
+            else:
+                still_prompt, motion = split_prompt(line)
             overrides = {"prompt": still_prompt, "motion": motion or args.motion}
             jobs.append(settings_from_args(argparse.Namespace(**{**vars(args), **overrides}), base))
     else:
+        if args.promote and args.prompt:
+            still_prompt, motion = as_promo(args.prompt)
+            args.prompt = still_prompt
+            if args.motion is None:
+                args.motion = motion
         job = settings_from_args(args, base)
         if not job["prompt"]:
-            parser.error("pass a prompt, --prompts, or --from")
+            parser.error("pass a prompt, --prompts, --promote, or --from")
         jobs = [job]
 
     text_only = "T2V-1.3B" in args.model_dir.name
@@ -224,7 +251,7 @@ def main() -> None:
             image = generate_still(prompt=job["prompt"], width=job["width"], height=job["height"])
             release_memory()
         elif image is None and not text_only:
-            raise SystemExit("This model needs a start image. Pass --still or --image.")
+            raise SystemExit("This model needs a start image. Pass --promote, --still, or --image.")
         generate_one(
             prompt=job["prompt"],
             model_dir=args.model_dir,

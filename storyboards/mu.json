@@ -1,0 +1,56 @@
+{
+  "title": "MU in 9 seconds",
+  "target_s": 9,
+  "voice": {
+    "ref_audio": "securities_clip.m4a",
+    "ref_text_file": "documents/ref_voice_transcript.txt",
+    "speed": 1.2
+  },
+  "captions": true,
+  "facts": "storyboards/mu.facts.json",
+  "shots": [
+    {
+      "type": "ai",
+      "still": "Extreme macro photograph of stacked high-bandwidth memory chips on a silicon interposer next to a GPU die, gold circuit traces, cool blue and violet light, dark background, shallow depth of field, technology commercial, no text, no logo.",
+      "motion": "The camera glides slowly across the chips and a band of light sweeps over the gold traces.",
+      "dur": 3.0,
+      "label": "MU · Micron",
+      "vo": "Every AI chip needs memory. Micron makes it."
+    },
+    {
+      "type": "chart",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/MU?range=1y&interval=1d",
+      "cache": "data/mu_1y.json",
+      "change_since": "2025-12-31",
+      "var": "ytd",
+      "title": "MU stock, last 12 months",
+      "headline": "+{ytd}% this year",
+      "source": "Daily closes via Yahoo Finance, through {last_date}",
+      "vo": "MU is up {ytd} percent this year."
+    },
+    {
+      "type": "card",
+      "lines": [
+        {
+          "text": "EARNINGS",
+          "size": 56,
+          "color": "#8A93A0"
+        },
+        {
+          "text": "{earnings_date}",
+          "size": 110,
+          "color": "#FFFFFF"
+        },
+        {
+          "text": "Not investment advice",
+          "size": 40,
+          "color": "#FFD84D",
+          "at": 0.6
+        }
+      ],
+      "source": "Source: {earnings_source}",
+      "vo": "Micron reports earnings {earnings_spoken}. Not investment advice.",
+      "min_dur": 2.0
+    }
+  ]
+}
