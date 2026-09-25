@@ -91,7 +91,7 @@ The template is [templates/end-card.json](templates/end-card.json). Pillow draws
 From the repo root:
 
 ```bash
-python -m http.server 8765
+uv run python -m http.server 8765
 ```
 
 Open http://127.0.0.1:8765/feed/ . The page plays the branded file when one exists, otherwise the clean clip, and shows the start image when the sidecar has one. It does not start a render.

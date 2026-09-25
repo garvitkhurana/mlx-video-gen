@@ -3,3 +3,4 @@ STATUS.md
 __pycache__/
 outputs/
 models/
+data/
