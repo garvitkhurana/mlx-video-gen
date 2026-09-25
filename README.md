@@ -21,38 +21,59 @@ Torch is only for the Wan conversion. After it finishes, `models/Wan2.2-TI2V-5B`
 
 ## Generate
 
-Name the subject and its size before the setting. Do not ask the model to draw words, logos, or prices.
+Say what you are promoting. The still shows that thing, large, with no words. The clip is a slow push-in. The name and the price go on afterwards with `brand.py`.
 
-A still is 704×1280, nine steps. The seed is chosen up front and saved next to the PNG.
+```bash
+uv run python generate.py --promote "a summer sneaker"
+uv run python generate.py --promote "a stock chart on a desk"
+```
+
+A full prompt still works. `--still` makes the PNG and animates it. `--image` uses a PNG you already have. `--turbo` is the fast clip, about 4 minutes, and `--promote` turns it on.
 
 ```bash
 uv run python still.py "A tiny white origami paper boat, small enough to sit in one hand, floating in a puddle on wet asphalt at night"
-uv run python still.py --from outputs/<id>.json
-```
-
-The clip is that still, then Wan 2.2 5B at 704×1280, 41 frames, 20 steps. `--still` makes the PNG and animates it. `--image` uses a PNG you already have.
-
-```bash
-uv run python generate.py "A tiny white origami paper boat, small enough to sit in one hand, floating in a puddle on wet asphalt at night" --still
-uv run python generate.py --prompts prompts.txt --still
-uv run python generate.py "..." --image outputs/<id>.png
+uv run python generate.py "..." --still --turbo --motion "The camera slowly pushes in."
+uv run python generate.py --prompts prompts.txt --still --turbo
 uv run python generate.py --from outputs/<id>.json
 ```
 
-`--num-frames` must be 4n+1 (17, 41, 81). A bare `generate.py` call uses Wan 2.2 5B and asks for `--still` or `--image`.
+`--num-frames` must be 4n+1 (17, 41, 81). A bare `generate.py` call uses Wan 2.2 5B and asks for `--promote`, `--still`, or `--image`.
 
-`--turbo` adds the Wan 2.2 5B Turbo LoRA: 4 steps, CFG off, about 4 min for 41 frames instead of 20. It needs the LoRA in `models/loras`:
+The Turbo LoRA has to be on disk once:
 
 ```bash
 uv run hf download Kijai/WanVideo_comfy LoRAs/Wan22-Turbo/Wan22_TI2V_5B_Turbo_lora_rank_64_fp16.safetensors --local-dir models/loras
-uv run python generate.py "<still prompt>" --still --turbo --motion "<what moves>"
 ```
 
-`--motion` is the video prompt. Describe only what moves (hair, waves, camera). Do not restate the scene or an expression the still already has, or the model redraws and exaggerates it. For people, frame the still at a medium shot or closer: faces in full-body shots are too small to hold steady.
+`--motion` replaces the push-in. Describe only what moves. Do not restate the subject the still already shows.
 
-`prompts.txt` is one prompt per line. `#` starts a comment. `still prompt || motion prompt` gives the clip its own motion prompt.
+`prompts.txt` is one prompt per line. `#` starts a comment. `still prompt || motion prompt` gives the clip its own motion prompt. `--promote` treats each line as the thing being advertised.
 
 A still writes `outputs/<id>.png` and `outputs/<id>.json`. A clip writes `outputs/<id>.mp4` and `outputs/<id>.json`, then refreshes `outputs/manifest.json`.
+
+## Storyboards (finished videos)
+
+A finished short is `storyboards/<name>.json`: a list of shots, each with an optional voiceover line (`vo`) or caption.
+
+```bash
+uv run python make.py storyboards/tokenization.json
+uv run python make.py storyboards/mu.json storyboards/beach.json --ai-only   # pre-render slow AI shots
+uv run python make.py storyboards/mu.json --refresh-data                      # new price data
+```
+
+Shot types:
+- `ai`: `still` + `motion` prompts, `dur` seconds. Z-Image still, then Wan 2.2 5B `--turbo`. Cached in `outputs/shots/`.
+- `notes`: hand-drawn explainer (`notes.py`): `text`, `highlight`, `box`, `arrow`, `tokens` (real `tiktoken` splits and IDs), `bracket`. Each element has `at` (seconds).
+- `card`: lines of text on a dark background, with a `source` line.
+- `chart`: daily closes from `url`, cached in `cache`; `change_since` sets `{<var>}` (percent change).
+
+`{name}` in any text is filled from `facts` (a JSON of values with sources), the chart, or the tokenizer (`{vocab}`). Only use numbers that come from those.
+
+An `ai` shot with `"continue": true` starts from the previous AI shot's last frame, so the same person keeps moving. Use it for every shot of one character; separate stills give a different person each time.
+
+Voiceover comes from `~/Projects/voice-clone` (your cloned voice), cached in `outputs/voice/`. Digits are spelled out for speech (captions keep the digits); add odd names to the storyboard's `pronounce` map (e.g. `"GPT-4o": "GPT four oh"`). Every line is transcribed with Whisper and must match the script, or it is retried and then the build stops. Write full sentences: very short lines are unstable with this voice model. The voice line sets how long the shot runs. Short-form targets: lifestyle ad 6–8 s, stock snapshot ~9 s, explainer ~30 s. `make.py` warns when a video runs more than 20% over `target_s`.
+
+Output: `outputs/<id>.mp4`, `outputs/<id>.txt` (transcript), `outputs/<id>.json` (sources and values), and a feed entry.
 
 ## Brand
 

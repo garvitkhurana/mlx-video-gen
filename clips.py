@@ -109,7 +109,7 @@ def rebuild_manifest(directory: Path | None = None) -> Path:
         data = load_json(path)
         if data.get("kind") == "branded" and data.get("source_id"):
             branded[data["source_id"]] = data
-        elif data.get("kind") == "clip":
+        elif data.get("kind") in ("clip", "video"):
             clips.append(data)
     clips.sort(key=lambda item: item.get("created_at", ""), reverse=True)
     items = []
