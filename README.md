@@ -63,4 +63,4 @@ A 1.7 s clip (the default) takes a few minutes; 5 s takes about 18. `--image-onl
 
 ## Licenses
 
-Wan 2.2 and Z-Image Turbo weights: Apache 2.0. `mlx-video`, `mflux`: MIT. The Turbo LoRA has no stated license; clear it before any paid use.
+This code: MIT (see LICENSE). Model weights keep their own licenses: Wan 2.2 and Z-Image Turbo, Apache 2.0. `mlx-video`, `mflux`: MIT. The Turbo LoRA has no stated license; clear it before any paid use.
