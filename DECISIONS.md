@@ -57,7 +57,7 @@ Clips are a Z-Image still, then Wan 2.2 5B with the Turbo LoRA (`Wan22_TI2V_5B_T
 
 **Known limit:** faces in full-body shots are small for the VAE and drift. Decode is now most of a 5 s clip's time (851 of 1087 s).
 
-## 2026-09-24 — Voiceover from ~/Projects/voice-clone (Qwen3-TTS clone, lite)
+## 2026-09-24 — Rejected — Voiceover from ~/Projects/voice-clone (Qwen3-TTS clone, lite)
 
 Narration uses the user's voice-clone project (Qwen3-TTS 0.6B 8-bit on mlx-audio), called as a subprocess with `uv run --project ~/Projects/voice-clone`. Reference: `securities_clip.m4a` (the user's own voice) plus `documents/ref_voice_transcript.txt`. One wav per shot, cached by text, voice, and speed.
 
@@ -65,7 +65,7 @@ Narration uses the user's voice-clone project (Qwen3-TTS 0.6B 8-bit on mlx-audio
 
 **Not chosen:** Kokoro (stock voice, extra download). Building new TTS here.
 
-## 2026-09-24 — Storyboards with typed shots: AI footage vs code-drawn graphics
+## 2026-09-24 — Rejected — Storyboards with typed shots: AI footage vs code-drawn graphics
 
 A video is `storyboards/<name>.json`. `make.py` renders each shot by type and assembles them with ffmpeg:
 - `ai`: Z-Image still, then Wan 2.2 5B `--turbo`.
@@ -76,3 +76,21 @@ Shots are cached by hash. Voiceover length sets shot length. AI shots stay 2–3
 **Why:** the video models cannot draw readable text, charts, or accurate facts. Code-drawn graphics are exact and instant. Caching means editing a caption or a line never re-renders footage.
 
 **Not chosen:** one AI clip per video (no text or data). Text-rendering image models for diagrams (text errors, facts not checkable).
+
+## 2026-09-26 — Still-then-clip only; no feed, no separate branding step
+
+AI footage is always a Z-Image Turbo still, then Wan 2.2 5B with the Turbo LoRA (4 steps, CFG off), both fixed in `ai.py`. Text-to-video alone dropped unusual subjects, so that path, its flags (steps, scheduler, shift, tiling, LoRA, `--model-dir`) and the `--prompts`/`--from`/`--promote` batch modes are gone. `generate.py` + `still.py` became `ai.py`.
+
+Removed: `brand.py` + `templates/` (`make.py` already draws captions and end cards), the `feed/` page and `outputs/manifest.json`, `prompts.txt` and the paper-boat test image. All are in git history.
+
+**Why:** the user asked for a simpler repo that is easy to follow. Every finished video comes from `make.py` storyboards; the removed code was only used for early experiments.
+
+## 2026-09-26 — main is one script: prompt → image → video
+
+`main` is `generate.py` only: Z-Image Turbo image, then Wan 2.2 5B with the Turbo LoRA. No storyboards, voiceover, captions or drawn shots. Four finished demos sit in `examples/` as reference (prompt or storyboard, start image, video).
+
+The storyboard pipeline (make.py, notes.py, voice-clone voiceover, charts) is kept whole on the `storyboards` branch, at `92135c0`. Its two decisions above are marked Rejected for `main` only.
+
+Video made by Claude (code-rendered animation, no image model) will be a separate project and repo under ~/Projects, not part of this one. No Claude step is added to local generation.
+
+**Why:** the user wants the simplest local example that is easy to follow; the storyboard pipeline was built for specific demos.

@@ -1,11 +1,10 @@
 [project]
 name = "video-gen"
 version = "0.0.1"
-description = "Local still, then a Wan 2.2 clip"
+description = "Prompt -> image -> video, locally on Apple Silicon"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "mlx-video @ git+https://github.com/Blaizzy/mlx-video.git",
   "mflux",
-  "tiktoken>=0.14.0",
 ]

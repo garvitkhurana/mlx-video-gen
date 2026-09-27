@@ -1,0 +1,6 @@
+GPT doesn't read words. It reads tokens.
+Your text gets cut into pieces: whole words, parts of words, even the space in front of a word.
+Each piece maps to a number from a fixed vocabulary.
+Common words are one token. Rare words break into smaller parts.
+GPT-4o's vocabulary holds about 200,000 tokens.
+Text becomes tokens, tokens become numbers, and numbers are what the model actually sees.

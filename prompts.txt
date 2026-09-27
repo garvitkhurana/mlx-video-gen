@@ -1,5 +1,0 @@
-# One prompt per line. Lines starting with # are skipped.
-# Name the subject and its size first. The setting comes after.
-# Footage only. Add words, logos, and prices later with brand.py.
-
-A tiny white origami paper boat, small enough to sit in one hand, floating in a puddle and drifting toward the camera on wet asphalt at night
