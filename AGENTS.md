@@ -19,6 +19,3 @@ The simplest local video generation example: a prompt → Z-Image Turbo draws th
 - 2026-09-24 — Wan 2.2 5B Turbo LoRA: 4 steps, guide 1, euler, shift 5. Same still and seed: 20 steps took 20 min and flickered; Turbo took 4.3 min and held the first frame. The LoRA has no stated license.
 - 2026-09-24 — Rejected — Storyboards with voiceover, captions and drawn graphics. Built for four demos; kept on the `storyboards` branch.
 - 2026-09-26 — main is one script, generate.py, with settings fixed. The four demos sit in `examples/`.
-
-## Session
-Read STATUS.md first if it exists (local only, not in the repo). Update it before ending a turn that changed files.
