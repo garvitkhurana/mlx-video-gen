@@ -44,7 +44,7 @@ A 1.7 s clip (the default) takes a few minutes; 5 s takes about 18. `--image-onl
 
 ## Examples
 
-`examples/` holds four finished videos with the prompt or storyboard and the image they started from. ReachDemo, StockDemo and ExplainDemo also used voiceover, captions and drawn graphics from the storyboard pipeline, which lives on the `storyboards` branch.
+`examples/` holds four finished videos with the prompt or storyboard and the image they started from. ReachDemo, StockDemo and ExplainDemo also used voiceover, captions and drawn graphics from the storyboard pipeline, which lives on the [`storyboards` branch](https://github.com/garvitkhurana/video-gen/tree/storyboards).
 
 ## Licenses
 
