@@ -10,6 +10,4 @@ The simplest local example of video generation: type a prompt, an image model dr
 
 ## Non-goals
 - Storyboards, voiceover, captions or assembled ads (they live on the `storyboards` branch).
-- Claude-made video (a separate project).
-- A UI for now (planned later, once the Claude project works too).
 - Production infrastructure or a multi-user platform.
