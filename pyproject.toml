@@ -1,5 +1,5 @@
 [project]
-name = "video-gen"
+name = "mlx-video-gen"
 version = "0.0.1"
 description = "Prompt -> image -> video, locally on Apple Silicon"
 readme = "README.md"

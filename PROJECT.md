@@ -1,4 +1,4 @@
-# video-gen: local prompt → image → video
+# mlx-video-gen: local prompt → image → video
 
 ## Goal
 The simplest local example of video generation: type a prompt, an image model draws the first frame, a video model animates it. One script, easy to read.
